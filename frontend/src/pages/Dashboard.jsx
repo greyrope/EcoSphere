@@ -131,6 +131,7 @@ const ScoreCard = ({ title, score, target, trend, accentColor }) => (
 export default function Dashboard() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentWeights, setCurrentWeights] = useState('40 / 30 / 30');
 
   // Simulate a network request loading time
   useEffect(() => {
@@ -143,6 +144,34 @@ export default function Dashboard() {
   const sortedDepartments = [...departmentRankings].sort((a, b) => {
     return sortOrder === 'desc' ? b.score - a.score : a.score - b.score;
   });
+
+  const handleExport = () => {
+    const payload = {
+      scores,
+      departments: sortedDepartments,
+      attention: requiresAttention,
+      activity: recentActivity,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: 'application/json',
+    });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'ecosphere-dashboard-summary.json';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  const handleConfigureWeights = () => {
+    const nextWeights = window.prompt(
+      'Set ESG weights as E / S / G',
+      currentWeights
+    );
+    if (nextWeights) {
+      setCurrentWeights(nextWeights);
+      alert(`Saved new ESG weights: ${nextWeights}`);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-8">
@@ -162,10 +191,16 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
+              <button
+                onClick={handleExport}
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+              >
                 Export PDF
               </button>
-              <button className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700">
+              <button
+                onClick={handleConfigureWeights}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
+              >
                 Configure Weights
               </button>
             </div>
@@ -323,7 +358,10 @@ export default function Dashboard() {
                         {task.text}
                       </p>
                     </div>
-                    <button className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-800">
+                    <button
+                      onClick={() => alert(`Opening review for ${task.text}`)}
+                      className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                    >
                       Review
                     </button>
                   </div>
@@ -337,7 +375,10 @@ export default function Dashboard() {
                 <h2 className="text-lg font-semibold text-slate-900">
                   Recent Activity
                 </h2>
-                <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                <button
+                  onClick={() => window.alert(`Dashboard weights: ${currentWeights}`)}
+                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                >
                   View All
                 </button>
               </div>

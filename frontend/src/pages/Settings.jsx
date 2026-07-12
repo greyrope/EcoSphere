@@ -81,11 +81,46 @@ export default function Settings() {
 
   // Local state for toggles so they actually animate when clicked
   const [toggles, setToggles] = useState(mockToggles);
+  const [departments, setDepartments] = useState(mockDepartments);
+  const [categories, setCategories] = useState(mockCategories);
 
   const handleToggle = (id) => {
     setToggles(
       toggles.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
     );
+  };
+
+  const handleAddDepartment = () => {
+    const name = window.prompt('Department name', 'New Department');
+    if (!name) return;
+
+    setDepartments((current) => [
+      {
+        id: Date.now(),
+        name,
+        code: name.slice(0, 4).toUpperCase(),
+        head: 'TBD',
+        parent: '-',
+        employees: 0,
+        status: 'Active',
+      },
+      ...current,
+    ]);
+  };
+
+  const handleAddCategory = () => {
+    const name = window.prompt('Category name', 'New Category');
+    if (!name) return;
+
+    setCategories((current) => [
+      {
+        id: Date.now(),
+        name,
+        type: 'CSR Activity',
+        status: 'Active',
+      },
+      ...current,
+    ]);
   };
 
   return (
@@ -162,7 +197,10 @@ export default function Settings() {
             <h2 className="text-lg font-semibold text-slate-900">
               Organizational Hierarchy
             </h2>
-            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800">
+            <button
+              onClick={handleAddDepartment}
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            >
               + Add Department
             </button>
           </div>
@@ -179,7 +217,7 @@ export default function Settings() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {mockDepartments.map((dept) => (
+                {departments.map((dept) => (
                   <tr
                     key={dept.id}
                     className="transition-colors hover:bg-slate-50"
@@ -214,7 +252,10 @@ export default function Settings() {
             <h2 className="text-lg font-semibold text-slate-900">
               Category Management
             </h2>
-            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none">
+            <button
+              onClick={handleAddCategory}
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none"
+            >
               + Add Category
             </button>
           </div>
@@ -229,7 +270,7 @@ export default function Settings() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {mockCategories.map((category) => (
+                {categories.map((category) => (
                   <tr
                     key={category.id}
                     className="transition-colors hover:bg-slate-50"

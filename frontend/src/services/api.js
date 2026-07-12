@@ -1,13 +1,33 @@
 import axios from 'axios';
 
-// Create an Axios instance
-// Note: Tell your backend partner to let you know what port they are running on (e.g., 5000 or 8080)
+const tokenStorageKey = 'ecosphere_token';
+
+const baseURL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+export const getStoredToken = () => localStorage.getItem(tokenStorageKey);
+
+export const setAuthToken = (token) => {
+  if (token) {
+    localStorage.setItem(tokenStorageKey, token);
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    return;
+  }
+
+  localStorage.removeItem(tokenStorageKey);
+  delete api.defaults.headers.common.Authorization;
+};
+
+const storedToken = getStoredToken();
+if (storedToken) {
+  api.defaults.headers.common.Authorization = `Bearer ${storedToken}`;
+}
 
 // Intercept responses to extract data directly and log errors globally
 api.interceptors.response.use(
@@ -18,23 +38,30 @@ api.interceptors.response.use(
   }
 );
 
-// Define your endpoint functions here based on the blueprint we made earlier
 export const esgService = {
-  // Dashboard Endpoints
-  getDashboardSummary: () => api.get('/dashboard/summary'),
-
-  // Gamification Endpoints
-  getActiveChallenges: () => api.get('/gamification/active'),
-  joinChallenge: (challengeId) =>
-    api.post(`/gamification/join`, { challengeId }),
-  redeemReward: (rewardId) => api.post(`/gamification/redeem`, { rewardId }),
-
-  // Settings Endpoints
-  updateBusinessRule: (ruleId, enabled) =>
-    api.patch(`/settings/rules/${ruleId}`, { enabled }),
-
-  // Reports
-  generateReport: (filters) => api.post('/reports/generate', filters),
+  getHealth: () => api.get('/health'),
+  signUp: (payload) => api.post('/auth/signup', payload),
+  signIn: (payload) => api.post('/auth/signin', payload),
+  getCurrentUser: () => api.get('/auth/me'),
+  getProfile: (userId) => api.get('/profile', { params: { user_id: userId } }),
+  getOrganization: (orgId) => api.get('/organizations', { params: { org_id: orgId } }),
+  getEnvironmentalMetrics: (orgId, params = {}) =>
+    api.get('/metrics/environmental', { params: { org_id: orgId, ...params } }),
+  getSocialMetrics: (orgId, params = {}) =>
+    api.get('/metrics/social', { params: { org_id: orgId, ...params } }),
+  getGovernanceMetrics: (orgId, params = {}) =>
+    api.get('/metrics/governance', { params: { org_id: orgId, ...params } }),
+  getPolicies: (orgId, category = '') =>
+    api.get('/policies', { params: { org_id: orgId, category } }),
+  createPolicy: (policy) => api.post('/policies', policy),
+  getBadges: () => api.get('/badges'),
+  getUserBadges: (userId) => api.get('/badges/user', { params: { user_id: userId } }),
+  getRewards: () => api.get('/rewards'),
+  redeemReward: (rewardId) => api.post('/rewards/redeem', { reward_id: rewardId }),
+  getNotifications: () => api.get('/notifications'),
+  markNotificationRead: (notificationId) =>
+    api.post('/notifications/read', { notification_id: notificationId }),
+  submitCSR: (payload) => api.post('/csr', payload),
 };
 
 export default api;

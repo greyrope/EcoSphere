@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGlobal } from '../context/GlobalContext';
+import { esgService } from '../services/api';
 
 export default function Profile() {
   const { user } = useGlobal();
@@ -18,9 +19,10 @@ export default function Profile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    alert('Profile updated successfully!');
+    await esgService.getProfile(user.id);
+    alert('Profile refreshed from backend.');
   };
 
   return (

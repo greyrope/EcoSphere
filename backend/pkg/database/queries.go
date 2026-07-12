@@ -6,11 +6,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+var tokenStore sync.Map
 
 type User struct {
 	ID             string         `json:"id"`
@@ -170,6 +173,7 @@ func CreateUser(email, password, fullName string) (*User, string, error) {
 	}
 
 	token := hashPassword(email + password + time.Now().String())
+	tokenStore.Store(token, user.ID)
 
 	return &user, token, nil
 }
@@ -189,10 +193,14 @@ func AuthenticateUser(email, password string) (*User, string, error) {
 	}
 
 	token := hashPassword(email + password + time.Now().String())
+	tokenStore.Store(token, user.ID)
 	return &user, token, nil
 }
 
 func GetUserByToken(token string) (string, error) {
+	if userID, ok := tokenStore.Load(token); ok {
+		return userID.(string), nil
+	}
 	return "", fmt.Errorf("token validation not implemented")
 }
 

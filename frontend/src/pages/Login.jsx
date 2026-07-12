@@ -1,21 +1,28 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGlobal } from '../context/GlobalContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useGlobal();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    // Simulate a network authentication delay for the live demo
-    setTimeout(() => {
+    try {
+      await login({ email, password });
+      navigate('/');
+    } catch (loginError) {
+      setError(loginError?.response?.data?.error || 'Login failed');
+    } finally {
       setIsLoading(false);
-      navigate('/'); // Redirect to the Dashboard
-    }, 1000);
+    }
   };
 
   return (
@@ -137,6 +144,7 @@ export default function Login() {
                   'Sign In'
                 )}
               </button>
+              {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
             </div>
 
             {/* Mock SSO Separator */}

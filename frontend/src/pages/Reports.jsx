@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { esgService } from '../services/api';
 
 export default function Reports() {
   const [filters, setFilters] = useState({
@@ -7,9 +8,35 @@ export default function Reports() {
     module: 'All Modules',
     category: 'All Categories',
   });
+  const [previewMessage, setPreviewMessage] = useState(
+    'Ready to generate a report.'
+  );
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  const handleGenerate = async () => {
+    setPreviewMessage('Generating report from backend data...');
+
+    try {
+      const orgId = 'demo-org';
+      const [environmental, social, governance, policies] = await Promise.all([
+        esgService.getEnvironmentalMetrics(orgId),
+        esgService.getSocialMetrics(orgId),
+        esgService.getGovernanceMetrics(orgId),
+        esgService.getPolicies(
+          orgId,
+          filters.category === 'All Categories' ? '' : filters.category
+        ),
+      ]);
+
+      setPreviewMessage(
+        `Loaded ${environmental.length} environmental, ${social.length} social, ${governance.length} governance records and ${policies.length} policies for ${filters.dateRange}.`
+      );
+    } catch (error) {
+      setPreviewMessage('Report preview updated locally. Backend data was unavailable.');
+    }
   };
 
   return (
@@ -98,7 +125,10 @@ export default function Reports() {
               </select>
             </div>
 
-            <button className="mt-4 w-full rounded-lg bg-slate-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800">
+            <button
+              onClick={handleGenerate}
+              className="mt-4 w-full rounded-lg bg-slate-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            >
               Apply Filters
             </button>
           </div>
@@ -113,13 +143,22 @@ export default function Reports() {
 
             {/* Export Buttons */}
             <div className="flex gap-2">
-              <button className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+              <button
+                onClick={() => window.alert('Exporting PDF')}
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
                 <span>📄</span> PDF
               </button>
-              <button className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+              <button
+                onClick={() => window.alert('Exporting Excel')}
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
                 <span>📊</span> Excel
               </button>
-              <button className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+              <button
+                onClick={() => window.alert('Exporting CSV')}
+                className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
                 <span>📝</span> CSV
               </button>
             </div>
@@ -131,11 +170,7 @@ export default function Reports() {
             <h3 className="mb-1 font-medium text-slate-900">
               Ready to Generate
             </h3>
-            <p className="text-sm text-slate-500">
-              Querying data for <strong>{filters.department}</strong> across{' '}
-              <strong>{filters.module}</strong> for{' '}
-              <strong>{filters.dateRange}</strong>.
-            </p>
+            <p className="text-sm text-slate-500">{previewMessage}</p>
           </div>
         </section>
       </div>

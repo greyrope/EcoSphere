@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGlobal } from '../context/GlobalContext.jsx';
+import { esgService } from '../services/api';
 
 // --- MOCK DATA ---
 const mockRewards = [
@@ -135,6 +136,7 @@ export default function Gamification() {
   const handleRedeem = (rewardName, cost) => {
     const success = deductXP(cost);
     if (success) {
+      esgService.redeemReward(rewardName).catch(() => null);
       alert(`Successfully redeemed ${rewardName}!`);
     } else {
       alert('Not enough XP!');
