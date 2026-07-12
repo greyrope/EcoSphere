@@ -5,6 +5,8 @@ import Environmental from './pages/Enviromental';
 import Social from './pages/Social';
 import Governance from './pages/Governance';
 import Gamification from './pages/Gamification';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
           <Route path="social" element={<Social />} />
           <Route path="governance" element={<Governance />} />
           <Route path="gamification" element={<Gamification />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>
