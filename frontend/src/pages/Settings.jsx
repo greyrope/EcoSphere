@@ -1,6 +1,19 @@
 import { useState } from 'react';
 
 // --- MOCK DATA ---
+const mockCategories = [
+  { id: 1, name: 'Environmental Impact', type: 'Challenge', status: 'Active' },
+  { id: 2, name: 'Tree Plantation', type: 'CSR Activity', status: 'Active' },
+  { id: 3, name: 'Community Cleanup', type: 'CSR Activity', status: 'Active' },
+  { id: 4, name: 'Commuting & Travel', type: 'Challenge', status: 'Active' },
+  {
+    id: 5,
+    name: 'Health & Well-being',
+    type: 'CSR Activity',
+    status: 'Archived',
+  },
+];
+
 const mockDepartments = [
   {
     id: 1,
@@ -194,11 +207,67 @@ export default function Settings() {
       )}
 
       {/* TAB CONTENT: Categories (Placeholder for completeness) */}
+      {/* TAB CONTENT: Categories Management */}
       {activeTab === 'Categories' && (
-        <section className="flex rounded-xl border border-dashed border-slate-300 bg-slate-50 py-12 text-center text-slate-500">
-          <div className="mx-auto">
-            Category Management UI goes here (CSR Activity Types, Challenge
-            Types).
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Category Management
+            </h2>
+            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none">
+              + Add Category
+            </button>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Name</th>
+                  <th className="px-6 py-4 font-medium">Type</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 text-right font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {mockCategories.map((category) => (
+                  <tr
+                    key={category.id}
+                    className="transition-colors hover:bg-slate-50"
+                  >
+                    <td className="px-6 py-4 font-semibold text-slate-900">
+                      {category.name}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          category.type === 'CSR Activity'
+                            ? 'bg-indigo-50 text-indigo-700'
+                            : 'bg-orange-50 text-orange-700'
+                        }`}
+                      >
+                        {category.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`rounded-md px-2 py-1 text-xs font-medium tracking-wider uppercase ${
+                          category.status === 'Active'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {category.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="text-sm font-medium text-slate-400 transition-colors hover:text-emerald-600">
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       )}

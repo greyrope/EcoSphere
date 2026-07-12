@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGlobal } from '../context/GlobalContext.jsx';
 
 // --- MOCK DATA ---
 const mockRewards = [
@@ -122,6 +123,7 @@ const BadgeItem = ({ badge }) => (
 // --- MAIN PAGE COMPONENT ---
 
 export default function Gamification() {
+  const { user, deductXP } = useGlobal();
   const [activeTab, setActiveTab] = useState('Active');
   const tabs = ['Draft', 'Active', 'Under Review', 'Completed', 'Archived'];
 
@@ -129,6 +131,15 @@ export default function Gamification() {
   const filteredChallenges = mockChallenges.filter(
     (c) => c.status === activeTab
   );
+
+  const handleRedeem = (rewardName, cost) => {
+    const success = deductXP(cost);
+    if (success) {
+      alert(`Successfully redeemed ${rewardName}!`);
+    } else {
+      alert('Not enough XP!');
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-8">
@@ -241,7 +252,9 @@ export default function Gamification() {
             </h2>
             <span className="text-sm font-medium text-slate-500">
               Your Balance:{' '}
-              <span className="font-bold text-emerald-600">3,250 XP</span>
+              <span className="font-bold text-emerald-600">
+                {user.xpBalance.toLocaleString()} XP
+              </span>
             </span>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,10 +279,15 @@ export default function Gamification() {
                   </p>
                 </div>
                 <button
-                  disabled={reward.stock === 0}
+                  disabled={
+                    reward.stock === 0 || user.xpBalance < reward.points
+                  }
+                  onClick={() => handleRedeem(reward.name, reward.points)}
                   className="mt-4 w-full rounded-lg bg-slate-900 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:bg-slate-300 disabled:text-slate-500"
                 >
-                  Redeem Reward
+                  {user.xpBalance < reward.points
+                    ? 'Not Enough XP'
+                    : 'Redeem Reward'}
                 </button>
               </div>
             ))}
