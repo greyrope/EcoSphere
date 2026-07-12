@@ -1,15 +1,16 @@
 package esg
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"net/http"
 
-	"ecosphere-backend/internal/ws"
+	"github.com/ecosphere/backend/internal/ws"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type API struct {
-	DB  *sql.DB
+	DB  *pgxpool.Pool
 	Hub *ws.Hub
 }
 
@@ -36,9 +37,9 @@ func (api *API) HandleSubmitCSR(w http.ResponseWriter, r *http.Request) {
 	// 3. Raw SQL Execution (ACID Compliant)
 	query := `INSERT INTO employee_participation (employee_id, activity_id, proof_url, approval_status) 
 	          VALUES ($1, $2, $3, 'Under Review') RETURNING id`
-	
+
 	var participationID int
-	err := api.DB.QueryRow(query, payload.EmployeeID, payload.ActivityID, payload.ProofURL).Scan(&participationID)
+	err := api.DB.QueryRow(context.Background(), query, payload.EmployeeID, payload.ActivityID, payload.ProofURL).Scan(&participationID)
 	if err != nil {
 		http.Error(w, "Database Failure", http.StatusInternalServerError)
 		return

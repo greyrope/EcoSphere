@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"ecosphere-backend/internal/esg"
-	"ecosphere-backend/internal/ws"
-	"ecosphere-backend/pkg/database"
+	"github.com/ecosphere/backend/internal/esg"
+	"github.com/ecosphere/backend/internal/ws"
+	"github.com/ecosphere/backend/pkg/database"
 	"github.com/joho/godotenv"
 )
 
