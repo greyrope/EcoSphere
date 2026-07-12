@@ -1,34 +1,16 @@
-# 🌍 EcoSphere: ESG Management Platform
+# React + Vite
 
-## 🏗️ System Architecture
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-This repository operates as a strict monorepo, housing a high-throughput Golang backend and a statically-typed React frontend. 
+Currently, two official plugins are available:
 
-### Tech Stack
-* **Backend Engine:** Golang (Go 1.21+)
-* **Database:** PostgreSQL (Relational Master/Transactional Data) 
-* **Frontend:** React + Vite + TypeScript
-* **Styling:** Tailwind CSS
-* **Real-Time Communication:** Native Go WebSockets (`gorilla/websocket`)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-### Core Engineering Highlights
-1. **Real-Time Notification Hub:** A custom WebSocket engine broadcasting CSR approvals, policy updates, and gamification badge unlocks with zero-latency polling.
-2. **ACID-Compliant Gamification Ledger:** Raw, atomic SQL transactions governing the Reward Redemption system. Ensures absolute data integrity when deducting XP and managing reward inventory.
-3. **Asynchronous Processing:** Heavy computational tasks, such as Auto Emission Calculations from ERP data, are offloaded to background Goroutines to prevent main-thread blocking.
+## React Compiler
 
----
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 🗂️ Project Structure
+## Expanding the ESLint configuration
 
-```text
-ecosphere-hackathon/
-├── backend/                        # High-concurrency Go REST & WebSocket API
-│   ├── cmd/api/                    # Application entrypoint
-│   ├── internal/                   # Domain logic (ESG modules, Gamification, Auth)
-│   ├── pkg/database/               # Connection pooling & Postgres bindings
-│   └── db/migrations/              # Raw .up.sql and .down.sql schema migrations
-│
-└── frontend/                       # Vite/React/TS Client
-    ├── src/components/             # Reusable, semantic UI components
-    ├── src/pages/                  # Module views (Environmental, Social, Governance)
-    └── src/services/               # API clients and WebSocket hook implementations
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
