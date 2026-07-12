@@ -61,35 +61,35 @@ The backend is a Go HTTP server using `gorilla/mux` for routing, `pgx` for Postg
 
 ### API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/signup` | Register a new user |
-| POST | `/api/auth/signin` | Authenticate and get token |
-| GET | `/api/auth/me` | Get current authenticated user |
-| GET | `/api/profile` | Get user profile by ID |
-| GET | `/api/organizations` | Get organization details |
-| GET | `/api/metrics/environmental` | Get environmental metrics |
-| GET | `/api/metrics/social` | Get social metrics |
-| GET | `/api/metrics/governance` | Get governance metrics |
-| GET | `/api/policies` | List policies (filterable by category) |
-| POST | `/api/policies` | Create a new policy |
-| GET | `/api/badges` | List all gamification badges |
-| GET | `/api/badges/user` | Get user's earned badges |
-| GET | `/api/rewards` | List redeemable rewards |
-| POST | `/api/rewards/redeem` | Redeem a reward (ACID transaction) |
-| GET | `/api/notifications` | Get user notifications |
-| POST | `/api/notifications/read` | Mark notification as read |
-| WS | `/ws?user_id=` | WebSocket for real-time notifications |
+| Method | Endpoint                     | Description                            |
+| ------ | ---------------------------- | -------------------------------------- |
+| POST   | `/api/auth/signup`           | Register a new user                    |
+| POST   | `/api/auth/signin`           | Authenticate and get token             |
+| GET    | `/api/auth/me`               | Get current authenticated user         |
+| GET    | `/api/profile`               | Get user profile by ID                 |
+| GET    | `/api/organizations`         | Get organization details               |
+| GET    | `/api/metrics/environmental` | Get environmental metrics              |
+| GET    | `/api/metrics/social`        | Get social metrics                     |
+| GET    | `/api/metrics/governance`    | Get governance metrics                 |
+| GET    | `/api/policies`              | List policies (filterable by category) |
+| POST   | `/api/policies`              | Create a new policy                    |
+| GET    | `/api/badges`                | List all gamification badges           |
+| GET    | `/api/badges/user`           | Get user's earned badges               |
+| GET    | `/api/rewards`               | List redeemable rewards                |
+| POST   | `/api/rewards/redeem`        | Redeem a reward (ACID transaction)     |
+| GET    | `/api/notifications`         | Get user notifications                 |
+| POST   | `/api/notifications/read`    | Mark notification as read              |
+| WS     | `/ws?user_id=`               | WebSocket for real-time notifications  |
 
 ### Go Packages
 
-| Package | Purpose |
-|---------|---------|
-| `cmd/api` | Application entrypoint, router setup, server start |
-| `internal/config` | Loads `.env` into typed `Config` struct |
-| `internal/handlers` | HTTP handler functions for each endpoint |
-| `internal/middleware` | Auth middleware (extracts user from `Authorization` header) |
-| `pkg/database` | `pgxpool` connection pool, all SQL query functions, WebSocket hub |
+| Package               | Purpose                                                           |
+| --------------------- | ----------------------------------------------------------------- |
+| `cmd/api`             | Application entrypoint, router setup, server start                |
+| `internal/config`     | Loads `.env` into typed `Config` struct                           |
+| `internal/handlers`   | HTTP handler functions for each endpoint                          |
+| `internal/middleware` | Auth middleware (extracts user from `Authorization` header)       |
+| `pkg/database`        | `pgxpool` connection pool, all SQL query functions, WebSocket hub |
 
 ---
 
@@ -99,21 +99,21 @@ EcoSphere uses [Supabase](https://supabase.com) as the database layer, which pro
 
 ### Schema Overview
 
-| Table | Purpose |
-|-------|---------|
-| `profiles` | Extended user profiles with XP/level tracking |
-| `organizations` | Company/organization records |
-| `environmental_metrics` | Carbon, energy, water, waste data |
-| `social_metrics` | Employee count, satisfaction, diversity, safety |
-| `governance_metrics` | Board independence, compliance, audits |
-| `policies` | CSR/ESG policy documents with approval workflows |
-| `csr_approvals` | Approval request tracking |
-| `badges` | Gamification badge catalog (bronze/silver/gold/platinum) |
-| `user_badges` | Earned badge records |
-| `rewards` | Redeemable reward catalog with XP costs |
-| `reward_redemptions` | ACID-compliant redemption ledger |
-| `xp_transactions` | XP earning/deduction audit trail |
-| `notifications` | Real-time notification feed |
+| Table                   | Purpose                                                  |
+| ----------------------- | -------------------------------------------------------- |
+| `profiles`              | Extended user profiles with XP/level tracking            |
+| `organizations`         | Company/organization records                             |
+| `environmental_metrics` | Carbon, energy, water, waste data                        |
+| `social_metrics`        | Employee count, satisfaction, diversity, safety          |
+| `governance_metrics`    | Board independence, compliance, audits                   |
+| `policies`              | CSR/ESG policy documents with approval workflows         |
+| `csr_approvals`         | Approval request tracking                                |
+| `badges`                | Gamification badge catalog (bronze/silver/gold/platinum) |
+| `user_badges`           | Earned badge records                                     |
+| `rewards`               | Redeemable reward catalog with XP costs                  |
+| `reward_redemptions`    | ACID-compliant redemption ledger                         |
+| `xp_transactions`       | XP earning/deduction audit trail                         |
+| `notifications`         | Real-time notification feed                              |
 
 ### Setup Steps
 
@@ -196,12 +196,12 @@ Dockerfile (production — multi-stage)
 
 ### Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `docker compose up backend --build` | Build and run production |
-| `docker compose --profile dev up backend-dev frontend-dev` | Run dev with hot-reload |
-| `docker compose down` | Stop all containers |
-| `docker compose build --no-cache` | Rebuild from scratch |
+| Command                                                    | Description              |
+| ---------------------------------------------------------- | ------------------------ |
+| `docker compose up backend --build`                        | Build and run production |
+| `docker compose --profile dev up backend-dev frontend-dev` | Run dev with hot-reload  |
+| `docker compose down`                                      | Stop all containers      |
+| `docker compose build --no-cache`                          | Rebuild from scratch     |
 
 ---
 
