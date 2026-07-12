@@ -17,12 +17,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api
 # ============================================
 FROM node:20-alpine AS frontend-builder
 
-WORKDIR /app
+WORKDIR /app/frontend
 
-COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
-COPY . .
+COPY frontend/ ./
 
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
@@ -42,7 +42,7 @@ RUN apk --no-cache add ca-certificates nginx
 WORKDIR /app
 
 COPY --from=go-builder /api /app/api
-COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 8080

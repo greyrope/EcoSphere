@@ -34,9 +34,12 @@ EcoSphere/
 │   ├── pkg/database/               # pgx connection pool & all SQL queries
 │   └── db/migrations/              # SQL schema migrations
 │
-├── src/                            # Vite/React Frontend
-│   ├── components/                 # Reusable, semantic UI components
-│   └── pages/                      # Module views (Dashboard, Environmental, Social, Governance, Gamification)
+├── frontend/                       # Vite/React Frontend
+│   ├── src/
+│   │   ├── components/             # Reusable, semantic UI components
+│   │   └── pages/                  # Module views (Dashboard, Environmental, Social, Governance, Gamification)
+│   ├── public/                     # Static assets
+│   └── package.json                # Frontend dependencies and scripts
 │
 ├── supabase/                       # Supabase configuration
 │   ├── config.toml                 # Supabase project config
@@ -208,7 +211,7 @@ Dockerfile (production — multi-stage)
 
 ```bash
 # 1. Install frontend dependencies
-npm install
+cd frontend && npm install && cd ..
 
 # 2. Install Go dependencies
 cd backend && go mod download && cd ..
@@ -224,7 +227,7 @@ cp .env.example .env
 cd backend && go run ./cmd/api
 
 # 6. Start the frontend (in another terminal)
-npm run dev
+cd frontend && npm run dev
 ```
 
 ### Local Development (with Docker)
