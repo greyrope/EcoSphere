@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import StatCard from "../components/common/StatCard";
 import {
   LineChart,
   Line,
