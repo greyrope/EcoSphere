@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import Environmental from './pages/Environmental';
+import Environmental from './pages/Enviromental';
 import Social from './pages/Social';
 import Governance from './pages/Governance';
 import Gamification from './pages/Gamification';
