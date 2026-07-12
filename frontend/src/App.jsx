@@ -8,11 +8,16 @@ import Gamification from './pages/Gamification';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import Login from './pages/Login'; // 1. Import the new Login component
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Full-Screen Route (No Navigation Bar) */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Platform Routes (Wrapped in the Top Navigation Bar) */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="environmental" element={<Environmental />} />
