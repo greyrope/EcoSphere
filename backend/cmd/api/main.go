@@ -5,78 +5,65 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ecosphere/backend/internal/config"
-	"github.com/ecosphere/backend/internal/handlers"
-	"github.com/ecosphere/backend/internal/middleware"
-	"github.com/ecosphere/backend/pkg/database"
-	"github.com/gorilla/mux"
-	"github.com/rs/cors"
+	"ecosphere-backend/internal/esg"
+	"ecosphere-backend/internal/ws"
+	"ecosphere-backend/pkg/database"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	cfg := config.Load()
-
-	if err := database.Connect(cfg.DatabaseURL); err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: No .env file found.")
 	}
-	defer database.Close()
 
-	go database.StartNotificationListener()
+	db := database.InitDB()
+	defer db.Close()
 
-	router := mux.NewRouter()
+	// Initialize the Real-Time Engine
+	hub := ws.NewHub()
+	go hub.Run()
 
-	api := router.PathPrefix("/api").Subrouter()
+	// Initialize the ESG API Module
+	esgAPI := &esg.API{
+		DB:  db,
+		Hub: hub,
+	}
 
-	api.HandleFunc("/auth/signup", handlers.SignUp).Methods("POST")
-	api.HandleFunc("/auth/signin", handlers.SignIn).Methods("POST")
+	mux := http.NewServeMux()
 
-	protected := api.NewRoute().Subrouter()
-	protected.Use(middleware.AuthMiddleware)
-
-	protected.HandleFunc("/auth/me", handlers.GetCurrentUser).Methods("GET")
-	protected.HandleFunc("/profile", handlers.GetProfile).Methods("GET")
-
-	protected.HandleFunc("/organizations", handlers.GetOrganization).Methods("GET")
-
-	protected.HandleFunc("/metrics/environmental", handlers.GetEnvironmentalMetrics).Methods("GET")
-	protected.HandleFunc("/metrics/social", handlers.GetSocialMetrics).Methods("GET")
-	protected.HandleFunc("/metrics/governance", handlers.GetGovernanceMetrics).Methods("GET")
-
-	protected.HandleFunc("/policies", handlers.GetPolicies).Methods("GET")
-	protected.HandleFunc("/policies", handlers.CreatePolicy).Methods("POST")
-
-	protected.HandleFunc("/badges", handlers.GetBadges).Methods("GET")
-	protected.HandleFunc("/badges/user", handlers.GetUserBadges).Methods("GET")
-	protected.HandleFunc("/rewards", handlers.GetRewards).Methods("GET")
-	protected.HandleFunc("/rewards/redeem", handlers.RedeemReward).Methods("POST")
-
-	protected.HandleFunc("/notifications", handlers.GetNotifications).Methods("GET")
-	protected.HandleFunc("/notifications/read", handlers.MarkNotificationRead).Methods("POST")
-
-	router.HandleFunc("/ws", handlers.WebSocketHandler)
-
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{cfg.CORSOrigin},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		AllowCredentials: true,
+	// Health Route
+	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status": "Operational"}`))
 	})
 
-	handler := c.Handler(router)
+	// THE WEBSOCKET ENDPOINT
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		ws.ServeWs(hub, w, r)
+	})
 
-	port := cfg.Port
+	// THE SOCIAL ESG ENDPOINT
+	mux.HandleFunc("/api/csr", esgAPI.HandleSubmitCSR)
+
+	// Add basic CORS headers for your Vite frontend
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		mux.ServeHTTP(w, r)
+	}
+
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("EcoSphere API server starting on :%s", port)
-	if err := http.ListenAndServe(":"+port, handler); err != nil {
-		log.Fatalf("Server failed: %v", err)
-	}
-}
-
-func init() {
-	if os.Getenv("DATABASE_URL") == "" {
-		log.Println("WARNING: DATABASE_URL not set")
+	log.Printf("EcoSphere API initialized. Listening on port %s...", port)
+	if err := http.ListenAndServe(":"+port, http.HandlerFunc(handler)); err != nil {
+		log.Fatalf("Critical Server Failure: %v", err)
 	}
 }
